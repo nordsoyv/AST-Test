@@ -53,7 +53,7 @@ test({
     createTestAst(nm);
     const jsonBefore = JSON.stringify(nm);
     const nm2 = new NodeManager();
-    nm2.buildFromJson(jsonBefore);
+    nm2.buildFromJsonString(jsonBefore);
     const jsonAfter = JSON.stringify(nm2);
     assertEquals(jsonBefore, jsonAfter);
   }

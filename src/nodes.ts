@@ -29,8 +29,8 @@ export class NodeManager {
     return this.nextId++;
   }
 
-  public buildFromJson(jsonModel: string) {
-    const model: JsonModel = JSON.parse(jsonModel);
+  public buildFromJsonString(json: string) {
+    const model: JsonModel = JSON.parse(json);
     this.scriptNode = model.scriptNode;
     model.nodes.forEach(n => this.createNodeFromJson(n));
   }

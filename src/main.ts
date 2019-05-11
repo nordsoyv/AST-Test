@@ -33,7 +33,7 @@ console.log(nm.print());
 const jsonModel = JSON.stringify(nm);
 
 const nm2 = new NodeManager();
-nm2.buildFromJson(jsonModel);
+nm2.buildFromJsonString(jsonModel);
 console.log("After JSON");
 console.log(nm2.print());
 
