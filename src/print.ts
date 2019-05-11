@@ -21,7 +21,7 @@ function printEntity(
   nodeArray: AST.AstNode[]
 ): string {
   let out = `${node.terms.join(" ")} #${node.name} {\n`;
-  node.children.forEach((c : AST.AstEntity) => (out += print(c, indent + 2, nodeArray)));
+  node.children.forEach((c  : AST.NodeIndex) => (out += print(c, indent + 2, nodeArray)));
   out += "}\n";
   return out;
 }
@@ -54,7 +54,7 @@ function printScript(
   indent: number,
   nodeArray: AST.AstNode[]
 ): string {
-  return node.children.map((c: AST.AstNode) => print(c, indent, nodeArray)).join("\n");
+  return node.children.map((c: AST.NodeIndex) => print(c, indent, nodeArray)).join("\n");
 }
 
 function printStringLiteral(

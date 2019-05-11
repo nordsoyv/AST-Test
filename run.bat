@@ -1,1 +1,1 @@
-deno run main.ts
+deno run src/main.ts
