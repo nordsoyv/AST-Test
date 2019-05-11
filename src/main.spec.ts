@@ -51,7 +51,6 @@ test({
   fn(): void {
     const nm = new NodeManager();
     createTestAst(nm);
-
     const jsonBefore = JSON.stringify(nm);
     const nm2 = new NodeManager();
     nm2.buildFromJson(jsonBefore);
