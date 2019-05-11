@@ -74,13 +74,19 @@ export class NodeManager {
     }
   }
 
-  public createAstScript(children: AST.AstNode[], id?: AST.NodeIndex): AST.AstScript {
+  public createAstScript(
+    children: AST.AstNode[],
+    id?: AST.NodeIndex
+  ): AST.AstScript {
     id = id || this.getNextId();
     children.forEach(c => (c.parent = id));
     return this.createAstScriptIdx(children.map(c => c.id), id);
   }
 
-  private createAstScriptIdx(children: AST.NodeIndex[], id: AST.NodeIndex): AST.AstScript {
+  private createAstScriptIdx(
+    children: AST.NodeIndex[],
+    id: AST.NodeIndex
+  ): AST.AstScript {
     const node: AST.AstScript = {
       parent: NO_PARENT,
       id,
@@ -135,7 +141,11 @@ export class NodeManager {
     return this.createAstStringIdx(value, id, parent);
   }
 
-  private createAstStringIdx(value: string, id: AST.NodeIndex, parent: AST.NodeIndex) {
+  private createAstStringIdx(
+    value: string,
+    id: AST.NodeIndex,
+    parent: AST.NodeIndex
+  ) {
     const node: AST.AstString = {
       id,
       parent,

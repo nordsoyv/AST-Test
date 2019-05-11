@@ -22,7 +22,5 @@
     "target": "esnext",
     "types": []
   },
-  "files": [
-    "*.ts"
-  ]
+  "files": ["*.ts"]
 }

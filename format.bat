@@ -1,1 +1,1 @@
-deno fmt .src/*
+deno fmt *
