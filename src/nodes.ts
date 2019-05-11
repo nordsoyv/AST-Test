@@ -79,7 +79,7 @@ export class NodeManager {
     id?: AST.NodeIndex
   ): AST.AstScript {
     id = id || this.getNextId();
-    this.setParentIdOnNodes(id,children);
+    this.setParentIdOnNodes(id, children);
     return this.createAstScriptIdx(children.map(c => c.id), id);
   }
 
@@ -165,7 +165,7 @@ export class NodeManager {
   ): AST.AstEntity {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
-    this.setParentIdOnNodes(id,children);
+    this.setParentIdOnNodes(id, children);
     return this.createAstEntityIdx(
       terms,
       name,
@@ -222,8 +222,11 @@ export class NodeManager {
     return node;
   }
 
-  private setParentIdOnNodes(parent: AST.NodeIndex, nodes : AST.AstNode | AST.AstNode[]){
-    nodes  =  Array.isArray(nodes) ? nodes : [nodes];
-    nodes.forEach((n : AST.AstNode) => n.parent = parent);
+  private setParentIdOnNodes(
+    parent: AST.NodeIndex,
+    nodes: AST.AstNode | AST.AstNode[]
+  ) {
+    nodes = Array.isArray(nodes) ? nodes : [nodes];
+    nodes.forEach((n: AST.AstNode) => (n.parent = parent));
   }
 }
