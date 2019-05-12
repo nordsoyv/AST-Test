@@ -1,10 +1,15 @@
 // @ts-ignore
 import * as AST from "./nodeTypes.ts";
 
+interface PrintOptions {
+  isProp?: boolean;
+}
+
 type PrintFunc = (
   node: AST.AstNode,
   indent: number,
-  nodeArray: AST.AstNode[]
+  nodeArray: AST.AstNode[],
+  options?: PrintOptions
 ) => string;
 
 function createIndent(n: number): string {
@@ -18,13 +23,24 @@ function createIndent(n: number): string {
 function printEntity(
   node: AST.AstEntity,
   indent: number,
-  nodeArray: AST.AstNode[]
+  nodeArray: AST.AstNode[],
+  printOptions?: PrintOptions
 ): string {
-  let out = `${node.terms.join(" ")} #${node.name} {\n`;
+  let isProp: boolean = false;
+  if (printOptions) {
+    isProp = printOptions.isProp ? printOptions.isProp : false;
+  }
+
+  const indentString = createIndent(indent);
+  let out: string = "";
+  if (!isProp) {
+    out = `${indentString}`;
+  }
+  out += `${node.terms.join(" ")} #${node.name} {\n`;
   node.children.forEach(
     (c: AST.NodeIndex) => (out += print(c, indent + 2, nodeArray))
   );
-  out += "}\n";
+  out += `${indentString}}\n`;
   return out;
 }
 
@@ -34,7 +50,9 @@ function printProp(
   nodeArray: AST.AstNode[]
 ): string {
   const indentString = createIndent(indent);
-  return `${indentString}${node.name}: ${print(node.rhs, indent, nodeArray)}\n`;
+  return `${indentString}${node.name}: ${print(node.rhs, indent, nodeArray, {
+    isProp: true
+  })}\n`;
 }
 
 function printOperator(
@@ -91,8 +109,9 @@ const printers: Record<AST.AstType, PrintFunc> = {
 export function print(
   nodeIndex: AST.NodeIndex,
   indent: number,
-  nodeArray: AST.AstNode[]
+  nodeArray: AST.AstNode[],
+  options?: PrintOptions
 ) {
   const node = nodeArray[nodeIndex];
-  return printers[node.type](node, indent, nodeArray);
+  return printers[node.type](node, indent, nodeArray, options);
 }

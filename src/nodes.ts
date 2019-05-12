@@ -14,12 +14,14 @@ export class NodeManager {
   nodes: AST.AstNode[] = [];
   nextId: number = 0;
   scriptNode: AST.NodeIndex = -1;
+
   private registerNode(n: AST.AstNode) {
     this.nodes[n.id] = n;
     if (n.id > this.nextId) {
       this.nextId = n.id + 1;
     }
   }
+
   public print(nodeIndex?: AST.NodeIndex) {
     nodeIndex = nodeIndex || this.scriptNode;
     return print(nodeIndex, 0, this.nodes);
@@ -27,6 +29,31 @@ export class NodeManager {
 
   private getNextId(): number {
     return this.nextId++;
+  }
+
+  public selectEntity(terms?: AST.Term[], name?: string) {
+    terms = terms ? terms : [];
+    const resultIdx: AST.NodeIndex[] = [];
+    for (let i = 0; i < this.nodes.length; i++) {
+      const node = this.nodes[i];
+      if (node.type !== AST.AstType.Entity) continue;
+      let match = true;
+      for (let j = 0; j < terms.length; j++) {
+        if (terms[j] !== node.terms[j]) {
+          match = false;
+          break;
+        }
+      }
+      if (match && name && node.name !== name) {
+        match = false;
+      }
+      if (match) resultIdx.push(i);
+    }
+    return resultIdx;
+  }
+
+  public getAstNode(index: AST.NodeIndex): AST.AstNode {
+    return this.nodes[index];
   }
 
   public buildFromJsonString(json: string) {
@@ -181,6 +208,7 @@ export class NodeManager {
       parent
     );
   }
+
   private createAstEntityIdx(
     terms: AST.Term[],
     name: string,

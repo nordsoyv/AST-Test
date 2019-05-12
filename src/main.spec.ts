@@ -90,4 +90,36 @@ test({
   }
 });
 
+test({
+  name: "Can find entities by terms",
+  fn(): void {
+    const nm = new NodeManager();
+    createTestAst(nm);
+    let res = nm.selectEntity(["config"]);
+    assertEquals(res.length, 2);
+    res = nm.selectEntity(["config", "hub"]);
+    assertEquals(res.length, 1);
+  }
+});
+
+test({
+  name: "Can find entities by name",
+  fn(): void {
+    const nm = new NodeManager();
+    createTestAst(nm);
+    let res = nm.selectEntity([], "ch");
+    assertEquals(res.length, 1);
+  }
+});
+
+test({
+  name: "Can find entities by terms and names",
+  fn(): void {
+    const nm = new NodeManager();
+    createTestAst(nm);
+    let res = nm.selectEntity(["config"], "ch");
+    assertEquals(res.length, 1);
+  }
+});
+
 runTests();

@@ -5,7 +5,14 @@ const nm = new NodeManager();
 
 nm.createAstScript([
   nm.createAstEntity(["config", "hub"], "ch", [
-    nm.createAstProperty("value", nm.createAstString("hello"))
+    nm.createAstProperty("value", nm.createAstString("hello")),
+    nm.createAstProperty(
+      "func",
+      nm.createAstFunction("count", [
+        nm.createAstString("hello"),
+        nm.createAstString("world")
+      ])
+    )
   ]),
   nm.createAstEntity(["config", "report"], "cr", [
     nm.createAstProperty(
@@ -23,24 +30,20 @@ nm.createAstScript([
         nm.createAstString("world"),
         nm.createAstString("hello")
       )
+    ),
+    nm.createAstProperty(
+      "formatter",
+      nm.createAstEntity(["formatter", "value"], "frm", [
+        nm.createAstProperty("presicsion", nm.createAstString("2"))
+      ])
     )
   ])
 ]);
 
-console.log("Before JSON");
 console.log(nm.print());
 
-const jsonModel = JSON.stringify(nm);
+let res = nm.selectEntity(["config"], "ch");
 
-const nm2 = new NodeManager();
-nm2.buildFromJsonString(jsonModel);
-console.log("After JSON");
-console.log(nm2.print());
-
-const jsonModel2 = JSON.stringify(nm2);
-
-if (jsonModel === jsonModel2) {
-  console.log("JSON IS THE SAME");
-} else {
-  console.log("JSON IS NOT THE SAME");
-}
+const n = nm.getAstNode(res[0]);
+console.table(n);
+console.dir(res);
