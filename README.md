@@ -28,7 +28,7 @@ config report #cr {
   }
 }
 ```
-becomes this JSON (1213 bytes minimized):
+becomes this JSON (1213 bytes minimized, 381 bytes gzip):
 ```
 {
   "scriptNode": 20,
