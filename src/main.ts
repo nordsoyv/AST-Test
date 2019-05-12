@@ -41,9 +41,4 @@ nm.createAstScript([
 ]);
 
 console.log(nm.print());
-
-let res = nm.selectEntity(["config"], "ch");
-
-const n = nm.getAstNode(res[0]);
-console.table(n);
-console.dir(res);
+console.log(JSON.stringify(nm));
