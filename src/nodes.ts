@@ -71,6 +71,14 @@ export class NodeManager {
           node.parent
         );
         break;
+      case AST.AstType.Function:
+        this.createAstFunctionIdx(
+          node.name,
+          node.parameters,
+          node.id,
+          node.parent
+        );
+        break;
     }
   }
 
@@ -107,8 +115,7 @@ export class NodeManager {
   ): AST.AstOperator {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
-    rhs.parent = id;
-    lhs.parent = id;
+    this.setParentIdOnNodes(id, [lhs, rhs]);
     return this.createAstOperatorIdx(op, rhs.id, lhs.id, id, parent);
   }
 
@@ -201,7 +208,7 @@ export class NodeManager {
   ): AST.AstProperty {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
-    rhs.parent = id;
+    this.setParentIdOnNodes(id, rhs);
     return this.createAstPropertyIdx(name, rhs.id, id, parent);
   }
 
@@ -217,6 +224,40 @@ export class NodeManager {
       parent,
       rhs,
       type: AST.AstType.Property
+    };
+    this.registerNode(node);
+    return node;
+  }
+
+  public createAstFunction(
+    name: string,
+    parameters: AST.AstNode[],
+    id?: AST.NodeIndex,
+    parent?: AST.NodeIndex
+  ) {
+    id = id || this.getNextId();
+    parent = parent || NO_PARENT;
+    this.setParentIdOnNodes(id, parameters);
+    return this.createAstFunctionIdx(
+      name,
+      parameters.map(p => p.id),
+      id,
+      parent
+    );
+  }
+
+  private createAstFunctionIdx(
+    name: string,
+    parameters: AST.NodeIndex[],
+    id: AST.NodeIndex,
+    parent: AST.NodeIndex
+  ) {
+    const node: AST.AstFunction = {
+      id,
+      name,
+      parent,
+      parameters: parameters,
+      type: AST.AstType.Function
     };
     this.registerNode(node);
     return node;

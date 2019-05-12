@@ -7,7 +7,8 @@ export enum AstType {
   Property = "property",
   StringLiteral = "stringLiteral",
   Operator = "operator",
-  Script = "scripts"
+  Script = "script",
+  Function = "function"
 }
 
 export interface AstEntity {
@@ -50,9 +51,18 @@ export interface AstScript {
   children: NodeIndex[];
 }
 
+export interface AstFunction {
+  type: AstType.Function;
+  parent: NodeIndex;
+  id: NodeIndex;
+  name: string;
+  parameters: NodeIndex[];
+}
+
 export type AstNode =
   | AstEntity
   | AstProperty
   | AstString
   | AstOperator
-  | AstScript;
+  | AstScript
+  | AstFunction;

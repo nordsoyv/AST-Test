@@ -51,6 +51,16 @@ function printOperator(
   );
 }
 
+function printFunction(
+  node: AST.AstFunction,
+  indent: number,
+  nodeArray: AST.AstNode[]
+) {
+  return `${node.name}(${node.parameters
+    .map(p => print(p, indent, nodeArray))
+    .join(", ")})`;
+}
+
 function printScript(
   node: AST.AstScript,
   indent: number,
@@ -66,7 +76,7 @@ function printStringLiteral(
   indent: number,
   nodeArray: AST.AstNode[]
 ): string {
-  return node.value;
+  return `"${node.value}"`;
 }
 
 const printers: Record<AST.AstType, PrintFunc> = {
@@ -74,7 +84,8 @@ const printers: Record<AST.AstType, PrintFunc> = {
   [AST.AstType.Entity]: printEntity,
   [AST.AstType.Operator]: printOperator,
   [AST.AstType.StringLiteral]: printStringLiteral,
-  [AST.AstType.Property]: printProp
+  [AST.AstType.Property]: printProp,
+  [AST.AstType.Function]: printFunction
 };
 
 export function print(
