@@ -1,14 +1,26 @@
 // @ts-ignore
-import * as AST from "./nodeTypes.ts";
+// import * as AST from "./nodes/nodes.ts";
+
+import {
+  AstEntityBase,
+  AstFunctionBase,
+  AstNodeBase,
+  AstOperatorBase,
+  AstPropertyBase,
+  AstScriptBase,
+  AstStringBase,
+  AstType,
+  NodeIndex
+} from "./nodes/baseNodes.ts";
 
 interface PrintOptions {
   isProp?: boolean;
 }
 
 type PrintFunc = (
-  node: AST.AstNode,
+  node: AstNodeBase,
   indent: number,
-  nodeArray: AST.AstNode[],
+  nodeArray: AstNodeBase[],
   options?: PrintOptions
 ) => string;
 
@@ -21,9 +33,9 @@ function createIndent(n: number): string {
 }
 
 function printEntity(
-  node: AST.AstEntity,
+  node: AstEntityBase,
   indent: number,
-  nodeArray: AST.AstNode[],
+  nodeArray: AstNodeBase[],
   printOptions?: PrintOptions
 ): string {
   let isProp: boolean = false;
@@ -38,16 +50,16 @@ function printEntity(
   }
   out += `${node.terms.join(" ")} #${node.name} {\n`;
   node.children.forEach(
-    (c: AST.NodeIndex) => (out += print(c, indent + 2, nodeArray))
+    (c: NodeIndex) => (out += print(c, indent + 2, nodeArray))
   );
   out += `${indentString}}\n`;
   return out;
 }
 
 function printProp(
-  node: AST.AstProperty,
+  node: AstPropertyBase,
   indent: number,
-  nodeArray: AST.AstNode[]
+  nodeArray: AstNodeBase[]
 ): string {
   const indentString = createIndent(indent);
   return `${indentString}${node.name}: ${print(node.rhs, indent, nodeArray, {
@@ -56,9 +68,9 @@ function printProp(
 }
 
 function printOperator(
-  node: AST.AstOperator,
+  node: AstOperatorBase,
   indent: number,
-  nodeArray: AST.AstNode[]
+  nodeArray: AstNodeBase[]
 ): string {
   return (
     print(node.lhs, indent, nodeArray) +
@@ -70,9 +82,9 @@ function printOperator(
 }
 
 function printFunction(
-  node: AST.AstFunction,
+  node: AstFunctionBase,
   indent: number,
-  nodeArray: AST.AstNode[]
+  nodeArray: AstNodeBase[]
 ) {
   return `${node.name}(${node.parameters
     .map(p => print(p, indent, nodeArray))
@@ -80,36 +92,36 @@ function printFunction(
 }
 
 function printScript(
-  node: AST.AstScript,
+  node: AstScriptBase,
   indent: number,
-  nodeArray: AST.AstNode[]
+  nodeArray: AstNodeBase[]
 ): string {
   return node.children
-    .map((c: AST.NodeIndex) => print(c, indent, nodeArray))
+    .map((c: NodeIndex) => print(c, indent, nodeArray))
     .join("\n");
 }
 
 function printStringLiteral(
-  node: AST.AstString,
+  node: AstStringBase,
   indent: number,
-  nodeArray: AST.AstNode[]
+  nodeArray: AstNodeBase[]
 ): string {
   return `"${node.value}"`;
 }
 
-const printers: Record<AST.AstType, PrintFunc> = {
-  [AST.AstType.Script]: printScript,
-  [AST.AstType.Entity]: printEntity,
-  [AST.AstType.Operator]: printOperator,
-  [AST.AstType.StringLiteral]: printStringLiteral,
-  [AST.AstType.Property]: printProp,
-  [AST.AstType.Function]: printFunction
+const printers: Record<AstType, PrintFunc> = {
+  [AstType.Script]: printScript,
+  [AstType.Entity]: printEntity,
+  [AstType.Operator]: printOperator,
+  [AstType.StringLiteral]: printStringLiteral,
+  [AstType.Property]: printProp,
+  [AstType.Function]: printFunction
 };
 
 export function print(
-  nodeIndex: AST.NodeIndex,
+  nodeIndex: NodeIndex,
   indent: number,
-  nodeArray: AST.AstNode[],
+  nodeArray: AstNodeBase[],
   options?: PrintOptions
 ) {
   const node = nodeArray[nodeIndex];

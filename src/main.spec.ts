@@ -4,7 +4,7 @@ import { runTests, test } from "https://deno.land/std/testing/mod.ts";
 import { assertEquals, assert } from "https://deno.land/std/testing/asserts.ts";
 
 // @ts-ignore
-import { NodeManager } from "./nodes.ts";
+import { NodeManager } from "./nodes/nodeManager.ts";
 
 function createTestAst(nm: NodeManager) {
   nm.createAstScript([

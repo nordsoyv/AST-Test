@@ -11,9 +11,10 @@ Testing AST representasion for CDL language
 
 Written for Deno https://github.com/denoland/deno v0.5
 
-
 ## Example
+
 Cdl like this :
+
 ```
 config hub #ch {
   value: "hello"
@@ -28,7 +29,9 @@ config report #cr {
   }
 }
 ```
+
 becomes this JSON (1213 bytes minimized, 381 bytes gzip):
+
 ```
 {
   "scriptNode": 20,

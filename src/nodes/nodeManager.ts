@@ -1,28 +1,42 @@
 // @ts-ignore
-import { print } from "./print.ts";
+import { print } from "../print.ts";
 // @ts-ignore
-import * as AST from "./nodeTypes.ts";
+// import * as AST from "./nodes.ts";
+import {
+  NodeIndex,
+  AstNodeBase,
+  AstScriptBase,
+  AstPropertyBase,
+  AstEntityBase,
+  AstFunctionBase,
+  AstOperatorBase,
+  AstStringBase,
+  AstType,
+  Term,
+  Operator
+} from "./baseNodes.ts";
+import { AstNode, createFacade } from "./nodes.ts";
 
 interface JsonModel {
-  scriptNode: AST.NodeIndex;
-  nodes: AST.AstNode[];
+  scriptNode: NodeIndex;
+  nodes: AstNodeBase[];
 }
 
 const NO_PARENT = -1;
 
 export class NodeManager {
-  nodes: AST.AstNode[] = [];
+  nodes: AstNodeBase[] = [];
   nextId: number = 0;
-  scriptNode: AST.NodeIndex = -1;
+  scriptNode: NodeIndex = -1;
 
-  private registerNode(n: AST.AstNode) {
+  private registerNode(n: AstNodeBase) {
     this.nodes[n.id] = n;
     if (n.id > this.nextId) {
       this.nextId = n.id + 1;
     }
   }
 
-  public print(nodeIndex?: AST.NodeIndex) {
+  public print(nodeIndex?: NodeIndex) {
     nodeIndex = nodeIndex || this.scriptNode;
     return print(nodeIndex, 0, this.nodes);
   }
@@ -31,12 +45,12 @@ export class NodeManager {
     return this.nextId++;
   }
 
-  public selectEntity(terms?: AST.Term[], name?: string) {
+  public selectEntity(terms?: Term[], name?: string) {
     terms = terms ? terms : [];
-    const resultIdx: AST.NodeIndex[] = [];
+    const resultIdx: NodeIndex[] = [];
     for (let i = 0; i < this.nodes.length; i++) {
       const node = this.nodes[i];
-      if (node.type !== AST.AstType.Entity) continue;
+      if (node.type !== AstType.Entity) continue;
       let match = true;
       for (let j = 0; j < terms.length; j++) {
         if (terms[j] !== node.terms[j]) {
@@ -52,8 +66,8 @@ export class NodeManager {
     return resultIdx;
   }
 
-  public getAstNode(index: AST.NodeIndex): AST.AstNode {
-    return this.nodes[index];
+  public getAstNode(index: NodeIndex): AstNode {
+    return createFacade(this.nodes[index], this.nodes);
   }
 
   public buildFromJsonString(json: string) {
@@ -69,9 +83,9 @@ export class NodeManager {
     };
   }
 
-  private createNodeFromJson(node: AST.AstNode) {
+  private createNodeFromJson(node: AstNodeBase) {
     switch (node.type) {
-      case AST.AstType.Entity:
+      case AstType.Entity:
         this.createAstEntityIdx(
           node.terms,
           node.name,
@@ -80,16 +94,16 @@ export class NodeManager {
           node.parent
         );
         break;
-      case AST.AstType.Property:
+      case AstType.Property:
         this.createAstPropertyIdx(node.name, node.rhs, node.id, node.parent);
         break;
-      case AST.AstType.StringLiteral:
+      case AstType.StringLiteral:
         this.createAstStringIdx(node.value, node.id, node.parent);
         break;
-      case AST.AstType.Script:
+      case AstType.Script:
         this.createAstScriptIdx(node.children, node.id);
         break;
-      case AST.AstType.Operator:
+      case AstType.Operator:
         this.createAstOperatorIdx(
           node.op,
           node.rhs,
@@ -98,7 +112,7 @@ export class NodeManager {
           node.parent
         );
         break;
-      case AST.AstType.Function:
+      case AstType.Function:
         this.createAstFunctionIdx(
           node.name,
           node.parameters,
@@ -110,23 +124,23 @@ export class NodeManager {
   }
 
   public createAstScript(
-    children: AST.AstNode[],
-    id?: AST.NodeIndex
-  ): AST.AstScript {
+    children: AstNodeBase[],
+    id?: NodeIndex
+  ): AstScriptBase {
     id = id || this.getNextId();
     this.setParentIdOnNodes(id, children);
     return this.createAstScriptIdx(children.map(c => c.id), id);
   }
 
   private createAstScriptIdx(
-    children: AST.NodeIndex[],
-    id: AST.NodeIndex
-  ): AST.AstScript {
-    const node: AST.AstScript = {
+    children: NodeIndex[],
+    id: NodeIndex
+  ): AstScriptBase {
+    const node: AstScriptBase = {
       parent: NO_PARENT,
       id,
       children,
-      type: AST.AstType.Script
+      type: AstType.Script
     };
     this.registerNode(node);
     this.scriptNode = id;
@@ -134,12 +148,12 @@ export class NodeManager {
   }
 
   public createAstOperator(
-    op: AST.Operator,
-    rhs: AST.AstNode,
-    lhs: AST.AstNode,
-    id?: AST.NodeIndex,
-    parent?: AST.NodeIndex
-  ): AST.AstOperator {
+    op: Operator,
+    rhs: AstNodeBase,
+    lhs: AstNodeBase,
+    id?: NodeIndex,
+    parent?: NodeIndex
+  ): AstOperatorBase {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
     this.setParentIdOnNodes(id, [lhs, rhs]);
@@ -147,19 +161,19 @@ export class NodeManager {
   }
 
   private createAstOperatorIdx(
-    op: AST.Operator,
-    rhs: AST.NodeIndex,
-    lhs: AST.NodeIndex,
-    id: AST.NodeIndex,
-    parent: AST.NodeIndex
-  ): AST.AstOperator {
-    const node: AST.AstOperator = {
+    op: Operator,
+    rhs: NodeIndex,
+    lhs: NodeIndex,
+    id: NodeIndex,
+    parent: NodeIndex
+  ): AstOperatorBase {
+    const node: AstOperatorBase = {
       id: id,
       parent,
       rhs: rhs,
       lhs: lhs,
       op,
-      type: AST.AstType.Operator
+      type: AstType.Operator
     };
     this.registerNode(node);
     return node;
@@ -167,36 +181,32 @@ export class NodeManager {
 
   public createAstString(
     value: string,
-    id?: AST.NodeIndex,
-    parent?: AST.NodeIndex
-  ): AST.AstString {
+    id?: NodeIndex,
+    parent?: NodeIndex
+  ): AstStringBase {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
     return this.createAstStringIdx(value, id, parent);
   }
 
-  private createAstStringIdx(
-    value: string,
-    id: AST.NodeIndex,
-    parent: AST.NodeIndex
-  ) {
-    const node: AST.AstString = {
+  private createAstStringIdx(value: string, id: NodeIndex, parent: NodeIndex) {
+    const node: AstStringBase = {
       id,
       parent,
       value,
-      type: AST.AstType.StringLiteral
+      type: AstType.StringLiteral
     };
     this.registerNode(node);
     return node;
   }
 
   public createAstEntity(
-    terms: AST.Term[],
+    terms: Term[],
     name: string,
-    children: AST.AstNode[],
-    id?: AST.NodeIndex,
-    parent?: AST.NodeIndex
-  ): AST.AstEntity {
+    children: AstNodeBase[],
+    id?: NodeIndex,
+    parent?: NodeIndex
+  ): AstEntityBase {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
     this.setParentIdOnNodes(id, children);
@@ -210,19 +220,19 @@ export class NodeManager {
   }
 
   private createAstEntityIdx(
-    terms: AST.Term[],
+    terms: Term[],
     name: string,
-    children: AST.NodeIndex[],
-    id: AST.NodeIndex,
-    parent: AST.NodeIndex
-  ): AST.AstEntity {
-    const node: AST.AstEntity = {
+    children: NodeIndex[],
+    id: NodeIndex,
+    parent: NodeIndex
+  ): AstEntityBase {
+    const node: AstEntityBase = {
       id,
       children: children,
       terms,
       name,
       parent: parent,
-      type: AST.AstType.Entity
+      type: AstType.Entity
     };
     this.registerNode(node);
     return node;
@@ -230,10 +240,10 @@ export class NodeManager {
 
   public createAstProperty(
     name: string,
-    rhs: AST.AstNode,
-    id?: AST.NodeIndex,
-    parent?: AST.NodeIndex
-  ): AST.AstProperty {
+    rhs: AstNodeBase,
+    id?: NodeIndex,
+    parent?: NodeIndex
+  ): AstPropertyBase {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
     this.setParentIdOnNodes(id, rhs);
@@ -242,16 +252,16 @@ export class NodeManager {
 
   private createAstPropertyIdx(
     name: string,
-    rhs: AST.NodeIndex,
-    id: AST.NodeIndex,
-    parent: AST.NodeIndex
-  ): AST.AstProperty {
-    const node: AST.AstProperty = {
+    rhs: NodeIndex,
+    id: NodeIndex,
+    parent: NodeIndex
+  ): AstPropertyBase {
+    const node: AstPropertyBase = {
       id,
       name,
       parent,
       rhs,
-      type: AST.AstType.Property
+      type: AstType.Property
     };
     this.registerNode(node);
     return node;
@@ -259,9 +269,9 @@ export class NodeManager {
 
   public createAstFunction(
     name: string,
-    parameters: AST.AstNode[],
-    id?: AST.NodeIndex,
-    parent?: AST.NodeIndex
+    parameters: AstNodeBase[],
+    id?: NodeIndex,
+    parent?: NodeIndex
   ) {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
@@ -276,26 +286,26 @@ export class NodeManager {
 
   private createAstFunctionIdx(
     name: string,
-    parameters: AST.NodeIndex[],
-    id: AST.NodeIndex,
-    parent: AST.NodeIndex
+    parameters: NodeIndex[],
+    id: NodeIndex,
+    parent: NodeIndex
   ) {
-    const node: AST.AstFunction = {
+    const node: AstFunctionBase = {
       id,
       name,
       parent,
       parameters: parameters,
-      type: AST.AstType.Function
+      type: AstType.Function
     };
     this.registerNode(node);
     return node;
   }
 
   private setParentIdOnNodes(
-    parent: AST.NodeIndex,
-    nodes: AST.AstNode | AST.AstNode[]
+    parent: NodeIndex,
+    nodes: AstNodeBase | AstNodeBase[]
   ) {
     nodes = Array.isArray(nodes) ? nodes : [nodes];
-    nodes.forEach((n: AST.AstNode) => (n.parent = parent));
+    nodes.forEach((n: AstNodeBase) => (n.parent = parent));
   }
 }

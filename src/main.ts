@@ -1,5 +1,7 @@
 // @ts-ignore
-import { NodeManager } from "./nodes.ts";
+import { NodeManager } from "./nodes/nodeManager.ts";
+// @ts-ignore
+import { AstEntity } from "./nodes/nodes.ts";
 
 const nm = new NodeManager();
 
@@ -45,5 +47,9 @@ console.log(JSON.stringify(nm));
 
 let res = nm.selectEntity(["config"], "ch");
 
-const n = nm.getAstNode(res[0]);
-console.log(JSON.stringify(n,null," "));
+const n = nm.getAstNode(res[0]) as AstEntity;
+// console.log(JSON.stringify(n, null, " "));
+
+console.log(n.type);
+console.log(n.terms);
+console.log(n.children);
