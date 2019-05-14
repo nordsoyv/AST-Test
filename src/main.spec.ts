@@ -58,7 +58,6 @@ config report #cr {
 `,
       cdl
     );
-    console.log("\n", cdl);
   }
 });
 
@@ -71,14 +70,13 @@ test({
     assert(json.length > 0);
     assertEquals(
       json,
-
-      '{"scriptNode":16,"nodes":[{"id":0,"parent":1,"value":"hello","type":"stringLiteral"},{"id":1,"name":"value","parent":6,"rhs":0,"type":"property"},{"id":2,"parent":4,"value":"hello","type":"stringLiteral"},{"id":3,"parent":4,"value":"world","type":"stringLiteral"},{"id":4,"name":"count","parent":5,"parameters":[2,3],"type":"function"},{"id":5,"name":"func","parent":6,"rhs":4,"type":"property"},{"id":6,"children":[1,5],"terms":["config","hub"],"name":"ch","parent":16,"type":"entity"},{"id":7,"parent":9,"value":"world","type":"stringLiteral"},{"id":8,"parent":9,"value":"hello","type":"stringLiteral"},{"id":9,"parent":10,"rhs":7,"lhs":8,"op":"+","type":"operator"},{"id":10,"name":"value","parent":15,"rhs":9,"type":"property"},{"id":11,"parent":13,"value":"world","type":"stringLiteral"},{"id":12,"parent":13,"value":"hello","type":"stringLiteral"},{"id":13,"parent":14,"rhs":11,"lhs":12,"op":"-","type":"operator"},{"id":14,"name":"value","parent":15,"rhs":13,"type":"property"},{"id":15,"children":[10,14],"terms":["config","report"],"name":"cr","parent":16,"type":"entity"},{"parent":-1,"id":16,"children":[6,15],"type":"script"}]}'
+      '{"scriptNode":16,"nodes":[{"id":0,"parent":1,"value":"hello","type":2},{"id":1,"name":"value","parent":6,"rhs":0,"type":1},{"id":2,"parent":4,"value":"hello","type":2},{"id":3,"parent":4,"value":"world","type":2},{"id":4,"name":"count","parent":5,"parameters":[2,3],"type":5},{"id":5,"name":"func","parent":6,"rhs":4,"type":1},{"id":6,"children":[1,5],"terms":["config","hub"],"name":"ch","parent":16,"type":0},{"id":7,"parent":9,"value":"world","type":2},{"id":8,"parent":9,"value":"hello","type":2},{"id":9,"parent":10,"rhs":7,"lhs":8,"op":"+","type":3},{"id":10,"name":"value","parent":15,"rhs":9,"type":1},{"id":11,"parent":13,"value":"world","type":2},{"id":12,"parent":13,"value":"hello","type":2},{"id":13,"parent":14,"rhs":11,"lhs":12,"op":"-","type":3},{"id":14,"name":"value","parent":15,"rhs":13,"type":1},{"id":15,"children":[10,14],"terms":["config","report"],"name":"cr","parent":16,"type":0},{"parent":-1,"id":16,"children":[6,15],"type":4}]}'
     );
   }
 });
 
 test({
-  name: "Json is equal",
+  name: "Json is equal nm -> json -> nm -> json",
   fn(): void {
     const nm = new NodeManager();
     createTestAst(nm);

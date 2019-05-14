@@ -6,11 +6,9 @@ import {
   AstOperatorBase,
   AstPropertyBase,
   AstScriptBase,
-  AstStringBase,
-  AstType,
-  NodeIndex,
-  Term
+  AstStringBase
 } from "./baseNodes.ts";
+import { AstType, NodeIndex, Term } from "./types.ts";
 
 export function createFacade(node: AstNodeBase, nodes: AstNodeBase[]): AstNode {
   switch (node.type) {

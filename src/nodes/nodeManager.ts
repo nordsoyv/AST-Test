@@ -1,21 +1,19 @@
 // @ts-ignore
 import { print } from "../print.ts";
 // @ts-ignore
-// import * as AST from "./nodes.ts";
 import {
-  NodeIndex,
   AstNodeBase,
   AstScriptBase,
   AstPropertyBase,
   AstEntityBase,
   AstFunctionBase,
   AstOperatorBase,
-  AstStringBase,
-  AstType,
-  Term,
-  Operator
+  AstStringBase
 } from "./baseNodes.ts";
+// @ts-ignore
 import { AstNode, createFacade } from "./nodes.ts";
+// @ts-ignore
+import { AstType, NodeIndex, Operator, Term } from "./types.ts";
 
 interface JsonModel {
   scriptNode: NodeIndex;
@@ -86,7 +84,7 @@ export class NodeManager {
   private createNodeFromJson(node: AstNodeBase) {
     switch (node.type) {
       case AstType.Entity:
-        this.createAstEntityIdx(
+        this.createAstEntityBase(
           node.terms,
           node.name,
           node.children,
@@ -95,16 +93,16 @@ export class NodeManager {
         );
         break;
       case AstType.Property:
-        this.createAstPropertyIdx(node.name, node.rhs, node.id, node.parent);
+        this.createAstPropertyBase(node.name, node.rhs, node.id, node.parent);
         break;
       case AstType.StringLiteral:
-        this.createAstStringIdx(node.value, node.id, node.parent);
+        this.createAstStringBase(node.value, node.id, node.parent);
         break;
       case AstType.Script:
-        this.createAstScriptIdx(node.children, node.id);
+        this.createAstScriptBase(node.children, node.id);
         break;
       case AstType.Operator:
-        this.createAstOperatorIdx(
+        this.createAstOperatorBase(
           node.op,
           node.rhs,
           node.lhs,
@@ -113,7 +111,7 @@ export class NodeManager {
         );
         break;
       case AstType.Function:
-        this.createAstFunctionIdx(
+        this.createAstFunctionBase(
           node.name,
           node.parameters,
           node.id,
@@ -129,10 +127,10 @@ export class NodeManager {
   ): AstScriptBase {
     id = id || this.getNextId();
     this.setParentIdOnNodes(id, children);
-    return this.createAstScriptIdx(children.map(c => c.id), id);
+    return this.createAstScriptBase(children.map(c => c.id), id);
   }
 
-  private createAstScriptIdx(
+  private createAstScriptBase(
     children: NodeIndex[],
     id: NodeIndex
   ): AstScriptBase {
@@ -157,10 +155,10 @@ export class NodeManager {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
     this.setParentIdOnNodes(id, [lhs, rhs]);
-    return this.createAstOperatorIdx(op, rhs.id, lhs.id, id, parent);
+    return this.createAstOperatorBase(op, rhs.id, lhs.id, id, parent);
   }
 
-  private createAstOperatorIdx(
+  private createAstOperatorBase(
     op: Operator,
     rhs: NodeIndex,
     lhs: NodeIndex,
@@ -186,10 +184,10 @@ export class NodeManager {
   ): AstStringBase {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
-    return this.createAstStringIdx(value, id, parent);
+    return this.createAstStringBase(value, id, parent);
   }
 
-  private createAstStringIdx(value: string, id: NodeIndex, parent: NodeIndex) {
+  private createAstStringBase(value: string, id: NodeIndex, parent: NodeIndex) {
     const node: AstStringBase = {
       id,
       parent,
@@ -210,7 +208,7 @@ export class NodeManager {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
     this.setParentIdOnNodes(id, children);
-    return this.createAstEntityIdx(
+    return this.createAstEntityBase(
       terms,
       name,
       children.map(c => c.id),
@@ -219,7 +217,7 @@ export class NodeManager {
     );
   }
 
-  private createAstEntityIdx(
+  private createAstEntityBase(
     terms: Term[],
     name: string,
     children: NodeIndex[],
@@ -247,10 +245,10 @@ export class NodeManager {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
     this.setParentIdOnNodes(id, rhs);
-    return this.createAstPropertyIdx(name, rhs.id, id, parent);
+    return this.createAstPropertyBase(name, rhs.id, id, parent);
   }
 
-  private createAstPropertyIdx(
+  private createAstPropertyBase(
     name: string,
     rhs: NodeIndex,
     id: NodeIndex,
@@ -276,7 +274,7 @@ export class NodeManager {
     id = id || this.getNextId();
     parent = parent || NO_PARENT;
     this.setParentIdOnNodes(id, parameters);
-    return this.createAstFunctionIdx(
+    return this.createAstFunctionBase(
       name,
       parameters.map(p => p.id),
       id,
@@ -284,7 +282,7 @@ export class NodeManager {
     );
   }
 
-  private createAstFunctionIdx(
+  private createAstFunctionBase(
     name: string,
     parameters: NodeIndex[],
     id: NodeIndex,

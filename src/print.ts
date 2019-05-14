@@ -8,10 +8,10 @@ import {
   AstOperatorBase,
   AstPropertyBase,
   AstScriptBase,
-  AstStringBase,
-  AstType,
-  NodeIndex
+  AstStringBase
 } from "./nodes/baseNodes.ts";
+// @ts-ignore
+import { AstType, NodeIndex } from "./nodes/types.ts";
 
 interface PrintOptions {
   isProp?: boolean;
@@ -87,7 +87,7 @@ function printFunction(
   nodeArray: AstNodeBase[]
 ) {
   return `${node.name}(${node.parameters
-    .map(p => print(p, indent, nodeArray))
+    .map((p: NodeIndex) => print(p, indent, nodeArray))
     .join(", ")})`;
 }
 
@@ -123,7 +123,7 @@ export function print(
   indent: number,
   nodeArray: AstNodeBase[],
   options?: PrintOptions
-) {
+): string {
   const node = nodeArray[nodeIndex];
   return printers[node.type](node, indent, nodeArray, options);
 }
