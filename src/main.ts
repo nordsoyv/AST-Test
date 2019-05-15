@@ -53,3 +53,5 @@ const n = nm.getAstNode(res[0]) as AstEntity;
 console.log(n.type);
 console.log(n.terms);
 console.log(n.children);
+console.log("\n\n\n");
+// console.log(JSON.stringify(n, null, 2));
